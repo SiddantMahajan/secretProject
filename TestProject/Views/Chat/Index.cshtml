@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    <style>
+        /* Add some basic styling */
+    </style>
+</head>
+<body>
+    <div>
+        <input type="text" id="userInput" placeholder="User" />
+        <input type="text" id="messageInput" placeholder="Message" />
+        <button id="sendButton">Send</button>
+    </div>
+    <hr />
+    <ul id="messagesList"></ul>
+
+    <!-- Reference the SignalR library -->
+    <script src="~/Scripts/jquery-1.6.4.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-1.0.0.js"></script>
+    <script>
+        $(function () {
+            var connection = $.connection('/chathub');
+
+            connection.received(function (user, message) {
+                var listItem = document.createElement("li");
+                listItem.textContent = `${user}: ${message}`;
+                document.getElementById("messagesList").appendChild(listItem);
+            });
+
+            connection.start().done(function () {
+                console.log('Connected to chat hub');
+            });
+
+            $('#sendButton').click(function () {
+                var user = $('#userInput').val();
+                var message = $('#messageInput').val();
+                connection.send('SendMessage', user, message);
+            });
+        });
+    </script>
+</body>
+</html>
